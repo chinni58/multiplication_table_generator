@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Multiplication Table Generator</title>
+  <style>
+    /* === Base Styling === */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Poppins', sans-serif;
+      background: radial-gradient(circle at 20% 30%, #0f0c29, #302b63, #24243e);
+      color: #f1f1f1;
+    }
+
+    .container {
+      background: rgba(255, 255, 255, 0.07);
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 18px;
+      padding: 30px;
+      width: 95%;
+      max-width: 900px;
+      box-shadow: 0 0 25px rgba(0, 255, 255, 0.15);
+      animation: fadeIn 0.7s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 25px;
+    }
+
+    header h1 {
+      font-size: 1.8rem;
+      color: #00ffff;
+      text-shadow: 0 0 12px #00ffffa0;
+    }
+
+    header p {
+      color: #a6b1e1;
+      font-size: 0.95rem;
+      margin-top: 6px;
+    }
+
+    /* === Form Styling === */
+    form {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 15px;
+      margin-bottom: 25px;
+    }
+
+    label {
+      font-size: 0.85rem;
+      color: #bfcde0;
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    input[type="number"] {
+      width: 100%;
+      padding: 10px 12px;
+      border: none;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      font-size: 1rem;
+      outline: none;
+      transition: background 0.3s;
+    }
+
+    input[type="number"]:focus {
+      background: rgba(0, 255, 255, 0.2);
+      box-shadow: 0 0 10px #00ffff40;
+    }
+
+    .btn {
+      grid-column: span 2;
+      background: linear-gradient(90deg, #00ffff, #38bdf8);
+      color: #001f2b;
+      font-weight: 700;
+      border: none;
+      padding: 12px 15px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 4px 15px rgba(0,255,255,0.2);
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0,255,255,0.35);
+    }
+
+    /* === Table === */
+    .table-wrapper {
+      background: rgba(0, 0, 0, 0.25);
+      border-radius: 12px;
+      padding: 15px;
+      overflow-x: auto;
+      border: 1px solid rgba(255,255,255,0.05);
+      box-shadow: inset 0 0 12px rgba(0,255,255,0.05);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      color: #e0f7fa;
+    }
+
+    th {
+      color: #00ffff;
+      border-bottom: 2px solid rgba(0,255,255,0.4);
+      padding: 10px;
+      font-weight: 700;
+      text-shadow: 0 0 8px #00ffff80;
+    }
+
+    td {
+      padding: 10px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+
+    tr:hover td {
+      background: rgba(0,255,255,0.05);
+      transition: background 0.2s;
+    }
+
+    .message {
+      text-align: center;
+      color: #9eb3c2;
+      padding: 20px;
+      font-style: italic;
+    }
+
+    /* === Footer === */
+    footer {
+      text-align: center;
+      margin-top: 15px;
+      font-size: 0.8rem;
+      color: #8492b1;
+    }
+
+    footer span {
+      color: #00ffff;
+      font-weight: 600;
+    }
+
+    /* Responsive fix */
+    @media (max-width: 600px) {
+      header h1 { font-size: 1.4rem; }
+      form { grid-template-columns: 1fr; }
+      .btn { grid-column: span 1; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header>
+      <h1>✨ Multiplication Table Generator ✨</h1>
+      <p>Enter your number and range — let the magic table appear below!</p>
+    </header>
+
+    <form method="post" novalidate>
+      {% csrf_token %}
+      <div>
+        <label for="id_base">Base Number</label>
+        {{ form.base }}
+        {% for error in form.base.errors %}
+          <small style="color:#ff9999;">{{ error }}</small>
+        {% endfor %}
+      </div>
+      <div>
+        <label for="id_start">Start</label>
+        {{ form.start }}
+      </div>
+      <div>
+        <label for="id_end">End</label>
+        {{ form.end }}
+      </div>
+      <div>
+        <label for="id_step">Step</label>
+        {{ form.step }}
+      </div>
+      <button type="submit" class="btn">Generate Table 🚀</button>
+    </form>
+
+    {% if result %}
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr><th>Multiplier</th><th>Result</th></tr>
+          </thead>
+          <tbody>
+            {% for m, prod in result %}
+              <tr>
+                <td>{{ m }}</td>
+                <td>{{ prod }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="message">
+        🧮 No results yet! Fill in the form above and click <strong>Generate Table</strong>.
+      </div>
+    {% endif %}
+
+    <footer>
+      Built with ❤️ using <span>Django</span> | Designed by You ✨
+    </footer>
+  </div>
+
+</body>
+</html>
